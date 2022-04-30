@@ -1,11 +1,66 @@
-getwd()
-setwd("/Users/shanmukhchintakula/Desktop/MET_CS_555_A3/555 Term Project")
-data <- read_csv("https://raw.githubusercontent.com/jaime-wang/CS544-project-Haomin-Shanmukh/main/Blueberry%20yield%20data.csv")
+
+
+data <- read.csv("https://raw.githubusercontent.com/jaime-wang/CS544-project-Haomin-Shanmukh/main/Blueberry%20yield%20data.csv")
 install.packages("corrplot")
 library(corrplot)
 library(RColorBrewer)
 library(sampling)
 library(rgl)
+
+################# Categorical data
+
+head(data)
+table(data$honeybee)
+table(data$bumbles)
+table(data$andrena)
+table(data$osmia)
+table(data$AverageRainingDays)
+data$h_density[data$honeybee <= 0.25] <- "low"
+data$h_density[data$honeybee > 0.25 & data$honeybee < 0.75] <- "medium"
+data$h_density[data$honeybee >= 0.75] <- "high"
+
+
+data$b_density[data$bumbles <= 0.25] <- "low"
+data$b_density[data$bumbles > 0.25 & data$bumbles < 0.75] <- "medium"
+data$b_density[data$bumbles >= 0.75] <- "high"
+
+
+data$a_density[data$andrena <= 0.25] <- "low"
+data$a_density[data$andrena > 0.25 & data$andrena < 0.75] <- "medium"
+data$a_density[data$andrena >= 0.75] <- "high"
+
+
+data$o_density[data$osmia <= 0.25] <- "low"
+data$o_density[data$osmia > 0.25 & data$osmia < 0.75] <- "medium"
+data$o_density[data$osmia >= 0.75] <- "high"
+
+table(data$h_density)
+table(data$b_density)
+table(data$a_density)
+table(data$o_density)
+h <- as.matrix(table(data$h_density));h
+b <- as.matrix(table(data$b_density));b
+b <- rbind(0,b); b
+rownames(b)[1] <- "high";b
+a <- as.matrix(table(data$a_density));a
+o <- as.matrix(table(data$o_density));o
+
+mat <- cbind(h,b,a,o)
+mat <- mat[c(2,3,1),];mat
+colnames(mat) <- c("honeybee","bumbles","andrena","osmia");mat
+barplot(mat,beside = TRUE,main = "Bee Density Bar Plot",xlab = "density",ylab="Frequency",
+        col = rainbow(3),legend= c("low density","medium density","high density"))
+
+##########################
+
+data$weather[data$AverageRainingDays <= 0.2] <- "dry"
+data$weather[data$AverageRainingDays > 0.2 & data$AverageRainingDays < 0.4] <- "normal"
+data$weather[data$AverageRainingDays >= 0.4] <- "rainy"
+table(data$weather)
+barplot(table(data$weather),beside = TRUE,main = "MAINE weather",xlab = "",ylab="Frequency",
+        col = rainbow(3))
+
+##########################
 
 corrplot(method="circle", cor(data), col=brewer.pal(n=8, name="RdBu"))
 
