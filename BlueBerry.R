@@ -1,6 +1,6 @@
 getwd()
 setwd("/Users/shanmukhchintakula/Desktop/MET_CS_555_A3/555 Term Project")
-data <- read_csv("WildBlueberryPollinationSimulationData.csv")
+data <- read_csv("https://raw.githubusercontent.com/jaime-wang/CS544-project-Haomin-Shanmukh/main/Blueberry%20yield%20data.csv")
 install.packages("corrplot")
 library(corrplot)
 library(RColorBrewer)
