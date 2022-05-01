@@ -74,15 +74,15 @@ ggplot(x, aes(Year, No_of_Immigrants, color= Country, group= Country)) +
 ## boxplot
 top_10 <- df_top[1:10,"Country"];top_10
 data_3 <- data_2 %>% filter(Country %in% top_10)
-ggplot(data_3, aes(Country, No_of_Immigrants, color= Country, group= Country)) + geom_boxplot()+coord_flip()
-
+ggplot(data_3, aes(Country, No_of_Immigrants, color= Country, group= Country)) + geom_boxplot()+coord_flip()+
+ylab("Number of immigrants per year")+labs(title ="TOP 10 Countries immigrants per year")
 
 ## Developing vs Developed
 df_year %>% group_by(DevName, Year) %>% summarise(Total_Immigrants = sum(No_of_Immigrants)) %>%
   ggplot(aes(Year, Total_Immigrants, fill= DevName, group= DevName)) +
   geom_area(size=0, alpha = 0.7, color= "white") +
   theme_economist(base_size = 22 ) +
-  labs(title = "Developing vs Developed Region Comparison of Immigration", y = "Total Immigrants") +
+  labs(title = "Developing vs Developed Region Immigration", y = "Total Immigrants") +
   theme(axis.text.x = element_text(angle = 90, hjust = 10, vjust = 0.3, size = 8)) + 
   theme(axis.text.y = element_text(hjust = 1.6)) +
   theme(axis.title.y = element_text(family = "A", size = 14, face= "bold", hjust = 0.3 ,vjust= 1.5), legend.position = "right") +
