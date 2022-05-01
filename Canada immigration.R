@@ -4,6 +4,8 @@ data <- read.csv("https://raw.githubusercontent.com/jaime-wang/CS544-project-Hao
 install.packages("corrplot")
 install.packages("ggplot2")
 install.packages("ggrepel")
+install.packages("ggpubr")
+
 library(ggplot2)
 library(corrplot)
 library(RColorBrewer)
@@ -12,6 +14,8 @@ library(rgl)
 library(ggrepel)
 library(tidyverse)
 library(ggthemes)
+library(ggpubr)
+library(sampling)
 ################# 
 head(data)
 colnames(data)[5:38] <- 1980:2013
@@ -92,57 +96,64 @@ df_year %>% group_by(DevName, Year) %>% summarise(Total_Immigrants = sum(No_of_I
 ## CLT on total migration for countries.
 
 samples <- 1000
-xbar <- numeric(samples)
 
-size<-10
+
+s10<-10
+xbar10 <- numeric(samples)
 set.seed(123)
 for (i in 1:samples) {
-  xbar[i] <- mean(data$Total[which(srswor(size, nrow(data))==1)])
+  xbar10[i] <- mean(data$Total[which(srswor(s10, nrow(data))==1)])
 }
 
-ggplot() + geom_histogram(aes(x= xbar, y=..density..), bins = 30) +
+size10<- ggplot() + geom_histogram(aes(x= xbar10, y=..density..), bins = 30) +
   ggtitle("Sample Size = 10")
 
-cat("Sample Size = ", size, " Mean = ", mean(xbar),
-    " SD = ", sd(xbar), "\n")
+cat("Sample Size = ", s10, " Mean = ", mean(xbar10),
+    " SD = ", sd(xbar10), "\n")
 
-size<-25
+s25<-25
+xbar25 <- numeric(samples)
 set.seed(123)
 for (i in 1:samples) {
-  xbar[i] <- mean(data$Total[which(srswor(size, nrow(data))==1)])
+  xbar25[i] <- mean(data$Total[which(srswor(s25, nrow(data))==1)])
 }
 
-ggplot() + geom_histogram(aes(x= xbar, y=..density..), bins = 30) +
+size25<- ggplot() + geom_histogram(aes(x= xbar25, y=..density..), bins = 30) +
   ggtitle("Sample Size = 25")
 
 
-cat("Sample Size = ", size, " Mean = ", mean(xbar),
-    " SD = ", sd(xbar), "\n")
+cat("Sample Size = ", s25, " Mean = ", mean(xbar25),
+    " SD = ", sd(xbar25), "\n")
 
 
-size<-45
+s45<-45
+xbar45 <- numeric(samples)
 set.seed(123)
 for (i in 1:samples) {
-  xbar[i] <- mean(data$Total[which(srswor(size, nrow(data))==1)])
+  xbar45[i] <- mean(data$Total[which(srswor(s45, nrow(data))==1)])
 }
 
-ggplot() + geom_histogram(aes(x= xbar, y=..density..), bins = 30) +
+size45<- ggplot() + geom_histogram(aes(x= xbar45, y=..density..), bins = 30) +
   ggtitle("Sample Size = 45")
 
-cat("Sample Size = ", size, " Mean = ", mean(xbar),
-    " SD = ", sd(xbar), "\n")
+cat("Sample Size = ", s45, " Mean = ", mean(xbar45),
+    " SD = ", sd(xbar45), "\n")
 
 
-size<-70
+s70<-70
+xbar70 <- numeric(samples)
 set.seed(123)
 for (i in 1:samples) {
-  xbar[i] <- mean(data$Total[which(srswor(size, nrow(data))==1)])
+  xbar70[i] <- mean(data$Total[which(srswor(s70, nrow(data))==1)])
 }
 
-ggplot() + geom_histogram(aes(x= xbar, y=..density..), bins = 30) +
-  ggtitle("Sample Size = 70")
+size70<- ggplot() + geom_histogram(aes(x= xbar70, y=..density..), bins = 30) +
+  ggtitle("Sample Size = 70") 
 
-cat("Sample Size = ", size, " Mean = ", mean(xbar),
-    " SD = ", sd(xbar), "\n")
+cat("Sample Size = ", s70, " Mean = ", mean(xbar70),
+    " SD = ", sd(xbar70), "\n")
 
+ggarrange(size10, size25, size45, size70 , 
+          labels = c("A", "B", "C", "D"),
+          ncol = 2, nrow = 2)
 
