@@ -19,7 +19,7 @@ df_Continent <- aggregate(data$Total,data["Continent"],sum)
 colnames(df_Continent)[2] <- "Total"
 
 ## Pie Chart
-whole <- sum(df_Continent$Total);whole
+whole <- sum(df_Continent$Total);
 df2 <- df_Continent %>% 
   mutate(csum = rev(cumsum(rev(Total))), 
          pos = Total/2 + lead(csum, 1),
@@ -47,12 +47,8 @@ p + geom_col() +
 
 
 df_top <- data[order(data$Total,decreasing = TRUE),]
-df_top[1:5,"Country"]
-colnames(data)
-
 df_year <- data %>% select(-Total) %>% gather(key = "Year", value = "No_of_Immigrants", -c(Country, Continent, Region, DevName));df_year
-head(df_year)
-df_top[1:5,]
+
 
 ## Line Chart
 data_2 <- data %>% select(-Total) %>% gather(key = "Year", value = "No_of_Immigrants", -c(Country, Continent, Region, DevName))
