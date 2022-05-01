@@ -1,187 +1,73 @@
 
 
-data <- read.csv("https://raw.githubusercontent.com/jaime-wang/CS544-project-Haomin-Shanmukh/main/Blueberry%20yield%20data.csv")
+data <- read.csv("https://raw.githubusercontent.com/jaime-wang/CS544-project-Haomin-Shanmukh/main/canadian_immegration_data.csv")
 install.packages("corrplot")
+install.packages("ggplot2")
+install.packages("ggrepel")
+library(ggplot2)
 library(corrplot)
 library(RColorBrewer)
 library(sampling)
 library(rgl)
-
+library(ggrepel)
+library(tidyverse)
 ################# Categorical data
-
 head(data)
-table(data$honeybee)
-table(data$bumbles)
-table(data$andrena)
-table(data$osmia)
-table(data$AverageRainingDays)
-data$h_density[data$honeybee <= 0.25] <- "low"
-data$h_density[data$honeybee > 0.25 & data$honeybee < 0.75] <- "medium"
-data$h_density[data$honeybee >= 0.75] <- "high"
+table(data$Continent)
+df_Continent <- aggregate(data$Total,data["Continent"],sum)
+colnames(df_Continent)[2] <- "Total"
+
+whole <- sum(df_Continent$Total);whole
+df2 <- df_Continent %>% 
+  mutate(csum = rev(cumsum(rev(Total))), 
+         pos = Total/2 + lead(csum, 1),
+         pos = if_else(is.na(pos), Total/2, pos))
+
+ggplot(df_Continent, aes(x = "" , y = Total, fill = fct_inorder(Continent))) +
+  geom_col(width = 1) +
+  coord_polar(theta = "y") +
+  scale_fill_brewer(palette = "Pastel1") +
+  geom_label_repel(data = df2,
+                   aes(y = pos, label = paste0(round(Total/whole*100,2), "%")),
+                   size = 4.5, nudge_x = 1, show.legend = FALSE) +
+  guides(fill = guide_legend(title = "Continent")) +
+  theme_void()
+
+p <- ggplot(data = df_Continent,
+            mapping = aes(
+              x = Continent, 
+              y = Total, 
+              fill = Continent))
+p + geom_col() +
+  guides(fill=FALSE)+coord_flip()+labs(y="immigration")
 
 
-data$b_density[data$bumbles <= 0.25] <- "low"
-data$b_density[data$bumbles > 0.25 & data$bumbles < 0.75] <- "medium"
-data$b_density[data$bumbles >= 0.75] <- "high"
+df_top <- data[order(data$Total,decreasing = TRUE),]
+df_top[1:5,"Country"]
+colnames(data)
+
+df_year <- data %>% select(-Total) %>% gather(key = "Year", value = "No. of Immigrants", -c(Country, Continent, Region, DevName));df_year
+head(df_year)
+df_top[1:5,]
+
+library(ggthemes)
+data_2 <- data %>% select(-Total) %>% gather(key = "Year", value = "No_of_Immigrants", -c(Country, Continent, Region, DevName))
+x <- data_2 %>% filter(Country == c("India")|Country == c("China")|Country == c("United Kingdom of Great Britain and Northern Ireland"))
+
+ggplot(x, aes(Year, No_of_Immigrants, color= Country, group= Country)) + 
+  geom_smooth(se= FALSE) + 
+  labs(title = "Immigration pattern of Top 3 Countries", y = "No. of Immigrants") +
+  theme_economist(base_size = 22 ) +
+  theme(axis.text.x = element_text(hjust = 1, vjust = 0.3)) + 
+  theme(axis.text.y = element_text(hjust = 1.6)) +
+  theme(axis.title.y = element_text(family = "serif", size = 14, face= "italic", hjust = 0.3 ,vjust= 0.5), legend.position = "right") +
+  theme(axis.title.x = element_text(family = "serif", size = 14, face= "italic")) +
+  theme(plot.title = element_text(family = "serif", size = 18, hjust = 0.5)) +
+  theme(legend.title = element_text(family = "serif", size = 14, face = "bold")) +
+  theme(legend.text = element_text(family = "serif", size = 12, face = "italic")) +
+  scale_x_discrete(breaks= c(1980, 1990, 2000, 2010))
 
 
-data$a_density[data$andrena <= 0.25] <- "low"
-data$a_density[data$andrena > 0.25 & data$andrena < 0.75] <- "medium"
-data$a_density[data$andrena >= 0.75] <- "high"
-
-
-data$o_density[data$osmia <= 0.25] <- "low"
-data$o_density[data$osmia > 0.25 & data$osmia < 0.75] <- "medium"
-data$o_density[data$osmia >= 0.75] <- "high"
-
-table(data$h_density)
-table(data$b_density)
-table(data$a_density)
-table(data$o_density)
-h <- as.matrix(table(data$h_density));h
-b <- as.matrix(table(data$b_density));b
-b <- rbind(0,b); b
-rownames(b)[1] <- "high";b
-a <- as.matrix(table(data$a_density));a
-o <- as.matrix(table(data$o_density));o
-
-mat <- cbind(h,b,a,o)
-mat <- mat[c(2,3,1),];mat
-colnames(mat) <- c("honeybee","bumbles","andrena","osmia");mat
-barplot(mat,beside = TRUE,main = "Bee Density Bar Plot",xlab = "density",ylab="Frequency",
-        col = rainbow(3),legend= c("low density","medium density","high density"))
-
-##########################
-
-data$weather[data$AverageRainingDays <= 0.2] <- "dry"
-data$weather[data$AverageRainingDays > 0.2 & data$AverageRainingDays < 0.4] <- "normal"
-data$weather[data$AverageRainingDays >= 0.4] <- "rainy"
-table(data$weather)
-barplot(table(data$weather),beside = TRUE,main = "MAINE weather",xlab = "",ylab="Frequency",
-        col = rainbow(3))
-
-##########################
-
-corrplot(method="circle", cor(data), col=brewer.pal(n=8, name="RdBu"))
-
-data<- data[ , -c(1, 8:13, 15:17)] # Removing highly correlated columns
-corrplot(method="circle", cor(data), col=brewer.pal(n=8, name="RdBu"))
-corrplot(method="number", cor(data), col=brewer.pal(n=8, name="RdBu"))
-glimpse(data)
-
-n<-500
-set.seed(2116)
-data<- data[which(srswor(n, nrow(data))==1), ]
-nrow(data)
-
-boxplot(data$yield, main="yield boxplot")
-
-model <- lm(yield ~ clonesize + honeybee + bumbles + andrena + osmia + MaxOfUpperTRange + AverageRainingDays , data = data)
-summary(model) #Adj R2=81.6%
-
-confint(model, conf.level=0.95)
-#81.6% of the variation in the output variable is explained by the input variables.
-#Reject Null hypothesis
-
-set.seed(2116)
-train.size <- 0.8
-train.index<- sample.int(n, n*train.size)
-length(train.index)
-train.sample <- data[train.index, ]
-valid.sample <- data[-train.index, ]
-
-nrow(train.sample)
-nrow(valid.sample)
-
-#Step wise selection of variables by backward elimination
-model <- lm(yield ~  honeybee + bumbles + andrena + osmia + MaxOfUpperTRange + AverageRainingDays , data = train.sample)
-summary(model) #Adj R2= 58.5%
-
-model <- lm(yield ~ clonesize  + bumbles + andrena + osmia + MaxOfUpperTRange + AverageRainingDays , data = train.sample)
-summary(model) #Adj R2= 80.9%
-
-model <- lm(yield ~ clonesize + honeybee  + andrena + osmia + MaxOfUpperTRange + AverageRainingDays , data = train.sample)
-summary(model) #Adj R2= 74.25%
-
-model <- lm(yield ~ clonesize + honeybee + bumbles  + osmia + MaxOfUpperTRange + AverageRainingDays , data = train.sample)
-summary(model) #Adj R2= 81.8% Remove Andrena
-
-model <- lm(yield ~ clonesize + honeybee + bumbles + andrena  + MaxOfUpperTRange + AverageRainingDays , data = train.sample)
-summary(model) #Adj R2= 76.4%
-
-model <- lm(yield ~ clonesize + honeybee + bumbles + andrena + osmia  + AverageRainingDays , data = train.sample)
-summary(model) #Adj R2= 79.0%
-
-model <- lm(yield ~ clonesize + honeybee + bumbles + andrena + osmia + MaxOfUpperTRange  , data = train.sample)
-summary(model) #Adj R2= 45.11%
-
-# Remove Andrena at Adj R2= 81.23%
-
-model2 <- lm(yield ~  honeybee + bumbles  + osmia + MaxOfUpperTRange + AverageRainingDays , data = train.sample)
-summary(model2) #Adj R2= 55.8.2% 
-
-model2 <- lm(yield ~ clonesize  + bumbles  + osmia + MaxOfUpperTRange + AverageRainingDays , data = train.sample)
-summary(model2) #Adj R2= 80.1 %  remove honeybee
-
-model2 <- lm(yield ~ clonesize + honeybee   + osmia + MaxOfUpperTRange + AverageRainingDays , data = train.sample)
-summary(model2) #Adj R2= % 
-
-model2 <- lm(yield ~ clonesize + honeybee + bumbles   + MaxOfUpperTRange + AverageRainingDays , data = train.sample)
-summary(model2) #Adj R2= % 
-
-model2 <- lm(yield ~ clonesize + honeybee + bumbles  + osmia  + AverageRainingDays , data = train.sample)
-summary(model2) #Adj R2= % 
-
-model2 <- lm(yield ~ clonesize + honeybee + bumbles  + osmia + MaxOfUpperTRange  , data = train.sample)
-summary(model2) #Adj R2= % 
-
-#  remove honeybee at Adj R2= 80.67 %
-
-model3 <- lm(yield ~   bumbles  + osmia + MaxOfUpperTRange + AverageRainingDays , data = train.sample)
-summary(model3) #Adj R2= %
-
-model3 <- lm(yield ~ clonesize    + osmia + MaxOfUpperTRange + AverageRainingDays , data = train.sample)
-summary(model3) #Adj R2= %
-
-model3 <- lm(yield ~ clonesize  + bumbles   + MaxOfUpperTRange + AverageRainingDays , data = train.sample)
-summary(model3) #Adj R2= %
-
-model3 <- lm(yield ~ clonesize  + bumbles  + osmia  + AverageRainingDays , data = train.sample)
-summary(model3) #Adj R2= 77.85%
-
-model3 <- lm(yield ~ clonesize  + bumbles  + osmia + MaxOfUpperTRange  , data = train.sample)
-summary(model3) #Adj R2= %
-
-#Nothing removed
-
-#final model
-model2 <- lm(yield ~ clonesize  + bumbles  + osmia + MaxOfUpperTRange + AverageRainingDays , data = train.sample)
-summary(model2) #Adj R2= 80.1 % 
-
-model2.valid <- lm(yield ~ clonesize  + bumbles  + osmia + MaxOfUpperTRange + AverageRainingDays , data = valid.sample)
-summary(model5)  #Adj R2=96.4
-
-plot(model2)
-plot(model2.valid)
-
-
-
-train.sample$Pred.Yield<- predict(model2, newdata = subset(train.sample, 
-select = c(clonesize , bumbles  , osmia , MaxOfUpperTRange , AverageRainingDays)))
-
-valid.sample$Pred.Yield<- predict(model2.valid, newdata = subset(valid.sample, 
-select = c(clonesize  , bumbles  , osmia , MaxOfUpperTRange , AverageRainingDays)))
-
-
-train.corr<- cor(train.sample$Pred.Yield, train.sample$yield)
-train.RMSE<- sqrt(mean((train.sample$Pred.Yield-train.sample$yield)^2))
-c(train.corr^2, train.RMSE)
-#0.8035189 594.8605725
-
-valid.corr<- cor(valid.sample$Pred.Yield, valid.sample$yield)
-valid.RMSE<- sqrt(mean((valid.sample$Pred.Yield-valid.sample$yield)^2))
-c(valid.corr^2, valid.RMSE)
-#0.8372958 597.9372955
 
 
 
