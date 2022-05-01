@@ -11,12 +11,16 @@ library(sampling)
 library(rgl)
 library(ggrepel)
 library(tidyverse)
-################# Categorical data
+library(ggthemes)
+################# 
 head(data)
+colnames(data)[5:38] <- 1980:2013
+colnames(data)
 table(data$Continent)
 df_Continent <- aggregate(data$Total,data["Continent"],sum)
 colnames(df_Continent)[2] <- "Total"
 
+## Pie Chart
 whole <- sum(df_Continent$Total);whole
 df2 <- df_Continent %>% 
   mutate(csum = rev(cumsum(rev(Total))), 
@@ -33,30 +37,32 @@ ggplot(df_Continent, aes(x = "" , y = Total, fill = fct_inorder(Continent))) +
   guides(fill = guide_legend(title = "Continent")) +
   theme_void()
 
+##Bar chart
+
 p <- ggplot(data = df_Continent,
             mapping = aes(
               x = Continent, 
               y = Total, 
               fill = Continent))
 p + geom_col() +
-  guides(fill=FALSE)+coord_flip()+labs(y="immigration")
+  guides(fill=FALSE)+coord_flip()+labs(y="Immigrants")
 
 
 df_top <- data[order(data$Total,decreasing = TRUE),]
 df_top[1:5,"Country"]
 colnames(data)
 
-df_year <- data %>% select(-Total) %>% gather(key = "Year", value = "No. of Immigrants", -c(Country, Continent, Region, DevName));df_year
+df_year <- data %>% select(-Total) %>% gather(key = "Year", value = "No_of_Immigrants", -c(Country, Continent, Region, DevName));df_year
 head(df_year)
 df_top[1:5,]
 
-library(ggthemes)
+## Line Chart
 data_2 <- data %>% select(-Total) %>% gather(key = "Year", value = "No_of_Immigrants", -c(Country, Continent, Region, DevName))
-x <- data_2 %>% filter(Country == c("India")|Country == c("China")|Country == c("United Kingdom of Great Britain and Northern Ireland"))
+x <- data_2 %>% filter(Country == c("India")|Country == c("China")|Country == c("United Kingdom of Great Britain and Northern Ireland")|Country == c("Philippines")|Country == c("Pakistan"))
 
 ggplot(x, aes(Year, No_of_Immigrants, color= Country, group= Country)) + 
   geom_smooth(se= FALSE) + 
-  labs(title = "Immigration pattern of Top 3 Countries", y = "No. of Immigrants") +
+  labs(title = "Immigration pattern of Top 5 Countries", y = "Immigrants") +
   theme_economist(base_size = 22 ) +
   theme(axis.text.x = element_text(hjust = 1, vjust = 0.3)) + 
   theme(axis.text.y = element_text(hjust = 1.6)) +
@@ -66,6 +72,21 @@ ggplot(x, aes(Year, No_of_Immigrants, color= Country, group= Country)) +
   theme(legend.title = element_text(family = "serif", size = 14, face = "bold")) +
   theme(legend.text = element_text(family = "serif", size = 12, face = "italic")) +
   scale_x_discrete(breaks= c(1980, 1990, 2000, 2010))
+
+
+df_year %>% group_by(DevName, Year) %>% summarise(Total_Immigrants = sum(No_of_Immigrants)) %>%
+  ggplot(aes(Year, Total_Immigrants, fill= DevName, group= DevName)) +
+  geom_area(size=0, alpha = 0.7, color= "white") +
+  theme_economist(base_size = 22 ) +
+  labs(title = "Developing vs Developed Region Comparison of Immigration", y = "Total Immigrants") +
+  theme(axis.text.x = element_text(angle = 90, hjust = 10, vjust = 0.3, size = 8)) + 
+  theme(axis.text.y = element_text(hjust = 1.6)) +
+  theme(axis.title.y = element_text(family = "A", size = 14, face= "bold", hjust = 0.3 ,vjust= 1.5), legend.position = "right") +
+  theme(axis.title.x = element_text(family = "A", size = 14, face= "bold")) +
+  theme(plot.title = element_text(family = "A", size = 18, hjust = 0.38)) +
+  theme(legend.title = element_text(family = "A", size = 9, face = "bold")) +
+  theme(legend.text = element_text(family = "A", size = 7, face = "bold"))+scale_fill_brewer(palette="Dark2")
+
 
 
 
