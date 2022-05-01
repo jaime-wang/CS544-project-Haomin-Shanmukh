@@ -73,7 +73,13 @@ ggplot(x, aes(Year, No_of_Immigrants, color= Country, group= Country)) +
   theme(legend.text = element_text(family = "serif", size = 12, face = "italic")) +
   scale_x_discrete(breaks= c(1980, 1990, 2000, 2010))
 
+## boxplot
+top_10 <- df_top[1:10,"Country"];top_10
+data_3 <- data_2 %>% filter(Country %in% top_10)
+ggplot(data_3, aes(Country, No_of_Immigrants, color= Country, group= Country)) + geom_boxplot()+coord_flip()
 
+
+## Developing vs Developed
 df_year %>% group_by(DevName, Year) %>% summarise(Total_Immigrants = sum(No_of_Immigrants)) %>%
   ggplot(aes(Year, Total_Immigrants, fill= DevName, group= DevName)) +
   geom_area(size=0, alpha = 0.7, color= "white") +
