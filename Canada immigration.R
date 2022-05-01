@@ -90,25 +90,59 @@ df_year %>% group_by(DevName, Year) %>% summarise(Total_Immigrants = sum(No_of_I
 
 
 ## CLT on total migration for countries.
-size<-10
+
 samples <- 1000
 xbar <- numeric(samples)
-par(mfrow = c(2,3))
 
+size<-10
 set.seed(123)
-for (size in c(10, 25, 45, 60, 75, 90)) {
-  for (i in 1:samples) {
-    xbar[i] <- mean(data$Total[which(srswor(size, nrow(data))==1)])
-  }
-  
-  hist(xbar, prob = TRUE,
-       breaks = 15, ylim=c(0,0.00006), xlim = c(0,150000),
-       main = paste("Sample Size =", size))
-  
-  cat("Sample Size = ", size, " Mean = ", mean(xbar),
-      " SD = ", sd(xbar), "\n")
+for (i in 1:samples) {
+  xbar[i] <- mean(data$Total[which(srswor(size, nrow(data))==1)])
 }
 
-par(mfrow = c(1,1))
+ggplot() + geom_histogram(aes(x= xbar, y=..density..), bins = 30) +
+  ggtitle("Sample Size = 10")
+
+cat("Sample Size = ", size, " Mean = ", mean(xbar),
+    " SD = ", sd(xbar), "\n")
+
+size<-25
+set.seed(123)
+for (i in 1:samples) {
+  xbar[i] <- mean(data$Total[which(srswor(size, nrow(data))==1)])
+}
+
+ggplot() + geom_histogram(aes(x= xbar, y=..density..), bins = 30) +
+  ggtitle("Sample Size = 25")
+
+
+cat("Sample Size = ", size, " Mean = ", mean(xbar),
+    " SD = ", sd(xbar), "\n")
+
+
+size<-45
+set.seed(123)
+for (i in 1:samples) {
+  xbar[i] <- mean(data$Total[which(srswor(size, nrow(data))==1)])
+}
+
+ggplot() + geom_histogram(aes(x= xbar, y=..density..), bins = 30) +
+  ggtitle("Sample Size = 45")
+
+cat("Sample Size = ", size, " Mean = ", mean(xbar),
+    " SD = ", sd(xbar), "\n")
+
+
+size<-70
+set.seed(123)
+for (i in 1:samples) {
+  xbar[i] <- mean(data$Total[which(srswor(size, nrow(data))==1)])
+}
+
+ggplot() + geom_histogram(aes(x= xbar, y=..density..), bins = 30) +
+  ggtitle("Sample Size = 70")
+
+cat("Sample Size = ", size, " Mean = ", mean(xbar),
+    " SD = ", sd(xbar), "\n")
 
 
