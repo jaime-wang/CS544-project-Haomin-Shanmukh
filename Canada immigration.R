@@ -15,8 +15,6 @@ library(ggthemes)
 ################# 
 head(data)
 colnames(data)[5:38] <- 1980:2013
-colnames(data)
-table(data$Continent)
 df_Continent <- aggregate(data$Total,data["Continent"],sum)
 colnames(df_Continent)[2] <- "Total"
 
@@ -58,7 +56,7 @@ df_top[1:5,]
 
 ## Line Chart
 data_2 <- data %>% select(-Total) %>% gather(key = "Year", value = "No_of_Immigrants", -c(Country, Continent, Region, DevName))
-x <- data_2 %>% filter(Country == c("India")|Country == c("China")|Country == c("United Kingdom of Great Britain and Northern Ireland")|Country == c("Philippines")|Country == c("Pakistan"))
+x <- data_2 %>% filter(Country %in% df_top[1:5,"Country"])
 
 ggplot(x, aes(Year, No_of_Immigrants, color= Country, group= Country)) + 
   geom_smooth(se= FALSE) + 
