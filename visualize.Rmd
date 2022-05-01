@@ -6,11 +6,13 @@ output:
     fig_width: 8
     code_folding: hide
     highlight: tango
-    toc: true
+    toc: yes
     toc_float:
-      collapsed: true
-editor_options: 
-  markdown: 
+      collapsed: yes
+  pdf_document:
+    toc: yes
+editor_options:
+  markdown:
     wrap: 72
 ---
 
