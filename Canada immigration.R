@@ -1,7 +1,7 @@
 
 
 data <- read.csv("https://raw.githubusercontent.com/jaime-wang/CS544-project-Haomin-Shanmukh/main/canadian_immegration_data.csv")
-data<-
+
 install.packages("corrplot")
 install.packages("ggplot2")
 install.packages("ggrepel")
@@ -18,6 +18,10 @@ library(ggthemes)
 library(ggpubr)
 library(sampling)
 ################# 
+data[data$Country == "United Kingdom of Great Britain and Northern Ireland", "Country"] <- "UK"
+data[data$Continent == "Latin America and the Caribbean", "Continent"] <- "S.America"
+data[data$Continent == "Northern America", "Continent"] <- "N.America"
+
 head(data)
 colnames(data)[5:38] <- 1980:2013
 df_Continent <- aggregate(data$Total,data["Continent"],sum)
