@@ -1,6 +1,7 @@
 
 
 data <- read.csv("https://raw.githubusercontent.com/jaime-wang/CS544-project-Haomin-Shanmukh/main/canadian_immegration_data.csv")
+data<-
 install.packages("corrplot")
 install.packages("ggplot2")
 install.packages("ggrepel")
@@ -105,7 +106,7 @@ for (i in 1:samples) {
   xbar10[i] <- mean(data$Total[which(srswor(s10, nrow(data))==1)])
 }
 
-size10<- ggplot() + geom_histogram(aes(x= xbar10, y=..density..), bins = 30) +
+size10<- ggplot() + geom_histogram(aes(x= xbar10, y=..density..), fill="lightskyblue", colour="navy blue"  , bins = 30) +
   ggtitle("Sample Size = 10")
 
 cat("Sample Size = ", s10, " Mean = ", mean(xbar10),
@@ -118,7 +119,7 @@ for (i in 1:samples) {
   xbar25[i] <- mean(data$Total[which(srswor(s25, nrow(data))==1)])
 }
 
-size25<- ggplot() + geom_histogram(aes(x= xbar25, y=..density..), bins = 30) +
+size25<- ggplot() + geom_histogram(aes(x= xbar25, y=..density..), fill="lightskyblue", colour="navy blue"  , bins = 30) +
   ggtitle("Sample Size = 25")
 
 
@@ -133,7 +134,7 @@ for (i in 1:samples) {
   xbar45[i] <- mean(data$Total[which(srswor(s45, nrow(data))==1)])
 }
 
-size45<- ggplot() + geom_histogram(aes(x= xbar45, y=..density..), bins = 30) +
+size45<- ggplot() + geom_histogram(aes(x= xbar45, y=..density..), fill="lightskyblue", colour="navy blue"  , bins = 30) +
   ggtitle("Sample Size = 45")
 
 cat("Sample Size = ", s45, " Mean = ", mean(xbar45),
@@ -147,7 +148,7 @@ for (i in 1:samples) {
   xbar70[i] <- mean(data$Total[which(srswor(s70, nrow(data))==1)])
 }
 
-size70<- ggplot() + geom_histogram(aes(x= xbar70, y=..density..), bins = 30) +
+size70<- ggplot() + geom_histogram(aes(x= xbar70, y=..density..), fill="lightskyblue", colour="navy blue"  , bins = 30) +
   ggtitle("Sample Size = 70") 
 
 cat("Sample Size = ", s70, " Mean = ", mean(xbar70),
@@ -157,3 +158,63 @@ ggarrange(size10, size25, size45, size70 ,
           labels = c("A", "B", "C", "D"),
           ncol = 2, nrow = 2)
 
+
+#############################################################
+
+
+#### Sampling Methods
+
+###Population
+barplot(table(data$Continent), las=2, col = "lightskyblue")
+
+
+##Systematic Sampling
+set.seed(195)
+#
+
+N <- nrow(data)
+n <- 39
+k <- ceiling(N / n)
+r <- sample(k, 1)
+s <- seq(r, by = k, length = n)
+
+sample.1 <- data[s, ]
+nrow(sample.1)
+barplot(table(sample.1$Continent), las=2, col = "lightskyblue")
+
+
+# Stratified, unequal sized strata
+set.seed(195)
+section.ids <- rep(LETTERS[1:4], c(10, 20, 30, 40))
+
+section.scores <- round(runif(100, 60, 80))
+
+df <- data.frame(data$Continent, data$DevName, data$Total)
+
+head(df)
+
+freq <- table(data$DevName)
+freq
+
+st.sizes <- round(39 * freq / sum(freq))
+st.sizes
+
+st.2 <- sampling::strata(df, stratanames = c("data.DevName"),
+                         size = st.sizes, method = "srswor",
+                         description = TRUE)
+
+nrow(st.2)
+
+st.sample2 <- getdata(df, st.2)
+st.sample2
+barplot(table(st.sample2$data.Continent),  las=2, col = "lightskyblue")
+
+
+# srswor
+
+s <- srswor(39, nrow(df))
+
+sample.3 <- df[s != 0, ]
+head(sample.3)
+barplot(table(sample.3$data.Continent), las=2, col = "lightskyblue")
+ggplot(sample.3, aes(x=data.Continent, y=data.Total))
