@@ -221,4 +221,4 @@ s <- srswor(39, nrow(df))
 sample.3 <- df[s != 0, ]
 head(sample.3)
 barplot(table(sample.3$data.Continent), las=2, col = "lightskyblue")
-ggplot(sample.3, aes(x=data.Continent, y=data.Total))
+
