@@ -162,6 +162,10 @@ ggarrange(size10, size25, size45, size70 ,
           labels = c("A", "B", "C", "D"),
           ncol = 2, nrow = 2)
 
+mean(data$Total)
+sd(data$Total)
+population<- ggplot() + geom_histogram(aes(x= data$Total, y=..density..), fill="lightskyblue", colour="navy blue"  , bins = 30) +
+  ggtitle("Sample Size = 1")
 
 #############################################################
 
